@@ -21,6 +21,7 @@ public abstract class Piece {
         //Board.setPiece(row, col, this);
     }
 
+    // What is row col? The piece's current row and col??? Do we need this??
     public Set<Move> findMoves(int row, int col, Board board){
         Set<Move> mm = new HashSet<>();
         int distance = getMoveSpaces();
@@ -75,6 +76,7 @@ public abstract class Piece {
         return mm;
     }
 
+    // What is row col? The piece's current row and col??? Do we need this??
     public Set<Pos> encounterCapture(int row, int col, Board board){
         Set<Pos> pp = new HashSet<>();
         int distance = getMoveSpaces();
