@@ -1,14 +1,17 @@
 package Rithmomachia;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class Board {
     private int rows; //Number of Rows
     private int cols; //Number of Columns
     private Piece[][] pieces;
+    private VictoryManager victoryManager;
 
-    Board(int numRows, int numCols, String[] str) {
+    public Board(int numRows, int numCols, String[] str) {
         initBoard(numRows,numCols);
         //System.out.println("Start [0, 0]: " + pieces[0][0]);
         //System.out.println("After 'pieces' are added [0, 0]: " + pieces[0][0]);
@@ -21,6 +24,23 @@ public class Board {
 
             }
         }
+        victoryManager = new VictoryManager(this, null, 0, 0, 0);
+    }
+
+    public Board(int numRows, int numCols, String[] str, Victory victory, int bodies, int digits, int values) {
+        initBoard(numRows,numCols);
+        //System.out.println("Start [0, 0]: " + pieces[0][0]);
+        //System.out.println("After 'pieces' are added [0, 0]: " + pieces[0][0]);
+        for (int i = 0; i < str.length; i++) {
+            String[] t = str[i].split(" +");
+            for (int j = 0; j < t.length; j++) {
+                //System.out.println("Placing piece at [" + i + "][" + j + "]: " + t[j]);
+                pieces[i][j] = fromString(t[j], i, j);
+                //System.out.println("Piece at [0, 0]: " + pieces[0][0]);
+
+            }
+        }
+        victoryManager = new VictoryManager(this, victory, bodies, digits, values);
     }
 
     private static Piece fromString(String s, int row, int col) {
@@ -158,12 +178,37 @@ public class Board {
         new Square(Color.W, 25, 13, 7);
     }*/
 
-
+    public void capture(Piece piece) {
+        victoryManager.capture(piece);
+    }
 
     public boolean isValidPos(int row, int col) {
         //System.out.print("isValidPos called: ");
         return row >= 0 && row < rows && col >= 0 && col < cols;
 
+    }
+
+    // Gets all pieces of the specified color on the board
+    public Set<Piece> getPiecesOfColor(Color color){
+        Set<Piece> pieces = new HashSet<>();
+        for (int i = 0; i < this.rows; i++) {
+            for (int j = 0; j < this.cols; j++) {
+                if (this.pieces[i][j] != null && this.pieces[i][j].getColor() == color){
+                    pieces.add(this.pieces[i][j]);
+                }
+            }
+        }
+        return pieces;
+    }
+
+    // Returns all pieces on the board as sets mapped to their color
+    public Map<Color, Set<Piece>> getAllPieces(){
+        Map<Color, Set<Piece>> pieces = new HashMap<>();
+        pieces.put(Color.B, new HashSet<>());
+        pieces.put(Color.W, new HashSet<>());
+        pieces.get(Color.B).addAll(this.getPiecesOfColor(Color.B));
+        pieces.get(Color.W).addAll(this.getPiecesOfColor(Color.W));
+        return pieces;
     }
 
     public Set<Piece> findClosestNeighbors(int xStart, int yStart){
